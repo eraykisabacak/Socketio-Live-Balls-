@@ -1,13 +1,33 @@
 app.controller('indexController',['$scope','indexFactory',($scope,indexFactory) =>{
 
-    const connectionOptions = {
-        reconnectionAttempts:3,
-            reconnectionDelay:1000
+    $scope.messages = [];
+    $scope.init = () => {
+        const username = prompt('Please enter username');
+
+        if(username)
+            initSocket(username);
+        else
+            return false;
     };
-    indexFactory.connectSocket("http://localhost:3000",connectionOptions)
-    .then((socket) => {
-        console.log('bağlantı başarılı',socket);
-    }).catch((err) => {
-        console.log(err);
-    });
+
+    function initSocket(username){
+        const connectionOptions = {
+            reconnectionAttempts:3,
+            reconnectionDelay:1000
+        };
+        indexFactory.connectSocket("http://localhost:3000",connectionOptions)
+            .then((socket) => {
+                socket.emit('newUser',{username});
+                socket.on('newUser',(data) => {
+                    const messageData = {
+                        type: 0,// info
+                        username: data.username
+                    };
+                    $scope.messages.push(messageData);
+                    $scope.$apply();
+                });
+             }).catch((err) => {
+                console.log(err);
+        });
+    }
 }]);
