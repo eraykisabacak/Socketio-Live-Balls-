@@ -1,4 +1,4 @@
-app.controller('indexController',['$scope','indexFactory',($scope,indexFactory) =>{
+app.controller('indexController',['$scope','indexFactory','configFactory',($scope,indexFactory,configFactory) =>{
 
     $scope.messages = [];
     $scope.players = {};
@@ -34,8 +34,8 @@ app.controller('indexController',['$scope','indexFactory',($scope,indexFactory) 
 
         try{
 
-
-        const socket = await indexFactory.connectSocket("http://localhost:3000",connectionOptions);
+        const socketUrl = await configFactory.getConfig();
+        const socket = await indexFactory.connectSocket(socketUrl.data.socketUrl,connectionOptions);
                 socket.on('initPlayers',(players) => {
                     $scope.players = players;
                     $scope.$apply();
